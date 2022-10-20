@@ -26,7 +26,7 @@ function open(url) {
   });
 }
 
-chrome.pageAction.onClicked.addListener(function(tab) {
+chrome.action.onClicked.addListener(function(tab) {
   open(tab.url);
 });
 
