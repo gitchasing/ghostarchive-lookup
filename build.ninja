@@ -1,0 +1,53 @@
+# Copyright 2021 Benjamin Barenblat
+# Copyright 2022 Google LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License"); you may not
+# use this file except in compliance with the License. You may obtain a copy of
+# the License at
+#
+#     https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+# WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+# License for the specific language governing permissions and limitations under
+# the License.
+
+name = wayback_machine_button
+
+rule generate_png
+  command = inkscape -w $width -h $width -o $out $in && optipng -o7 $out
+  description = Generating $out
+
+rule minify_html
+  command = minify $in | htmlmin >$out
+  description = Minifying $in
+
+rule minify_js
+  command = uglifyjs $in -m --toplevel -o $out
+  description = Minifying $in
+
+rule minify_json
+  command = jq -Sc . $in >$out
+  description = Minifying $in
+
+rule zip
+  command = zip -qr $out $in
+  description = Zipping $out
+
+build $name/background.js: minify_js background.js
+build $name/manifest.json: minify_json manifest.json
+build $name/options.html: minify_html options.html
+build $name/options.js: minify_js options.js
+build $name/icon128.png: generate_png third_party/icon.svg
+  width = 128
+build $name/icon48.png: generate_png third_party/icon.svg
+  width = 48
+build $name/icon16.png: generate_png third_party/icon.svg
+  width = 16
+
+build icon_bordered.png: generate_png third_party/icon_bordered.svg
+  width = 128
+build $name.zip: zip $name/background.js $name/manifest.json $
+    $name/options.html $name/options.js $name/icon128.png $name/icon48.png $
+    $name/icon16.png

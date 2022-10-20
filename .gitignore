@@ -4,8 +4,12 @@
 .\#*
 .*.swp
 
+# Build system
+.ninja_*
+
 # Generated files
-icon*.png
+wayback_machine_button
+icon_bordered.png
 *.zip
 
 
