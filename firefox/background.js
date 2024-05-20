@@ -1,4 +1,4 @@
-// Copyright 2017 Google LLC
+// Copyright 2024 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not
 // use this file except in compliance with the License. You may obtain a copy of
@@ -15,41 +15,27 @@
 const MENU_ITEM_OPEN_LINK = 'openLink';
 
 function open(url) {
-  chrome.storage.sync.get({
-    clickBehavior: 'search',
-  }, function(items) {
+  browser.storage.sync.get({clickBehavior: 'search'}).then(function(items) {
     let waybackStem = 'https://web.archive.org/web/*/';
     if (items.clickBehavior == 'direct') {
       waybackStem = 'https://web.archive.org/web/';
     }
-    chrome.tabs.update(null, {url: waybackStem + url});
+    browser.tabs.update(null, {url: waybackStem + url});
   });
 }
 
-chrome.action.onClicked.addListener(function(tab) {
+browser.pageAction.onClicked.addListener(function(tab) {
   open(tab.url);
 });
 
-chrome.contextMenus.onClicked.addListener(function(info, tab) {
+browser.contextMenus.onClicked.addListener(function(info, tab) {
   if (info.menuItemId == MENU_ITEM_OPEN_LINK) {
     open(info.linkUrl);
   }
 });
 
-chrome.runtime.onInstalled.addListener(function() {
-  chrome.declarativeContent.onPageChanged.removeRules(null, function() {
-    chrome.declarativeContent.onPageChanged.addRules([
-      {
-        conditions: [
-          new chrome.declarativeContent.PageStateMatcher(
-              {pageUrl: {schemes: ['ftp', 'http', 'https']}}),
-        ],
-        actions: [new chrome.declarativeContent.ShowPageAction()],
-      },
-    ]);
-  });
-
-  chrome.contextMenus.create({
+browser.runtime.onInstalled.addListener(function() {
+  browser.contextMenus.create({
     'id': MENU_ITEM_OPEN_LINK,
     'title': 'Open link in the Wayback Machine',
     'contexts': ['link'],

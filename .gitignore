@@ -8,8 +8,7 @@
 .ninja_*
 
 # Generated files
-wayback_machine_button
-icon_bordered.png
+build
 *.zip
 
 
