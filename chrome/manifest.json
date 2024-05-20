@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Wayback Machine Lookup",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "Reopen the current tab in the Wayback Machine",
   "icons": {
     "16": "icon16.png",
