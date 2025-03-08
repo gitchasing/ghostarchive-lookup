@@ -1,3 +1,4 @@
+// Copyright 2025 gitchasing
 // Copyright 2017 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not
@@ -12,15 +13,26 @@
 // License for the specific language governing permissions and limitations under
 // the License.
 
+// As required by s4b of the License, all modifications to this file have
+// been specified by the new author (gitchasing).
+// Regard the NOTICE for a list of these changes.
+
 const MENU_ITEM_OPEN_LINK = 'openLink';
 
 function open(url) {
-  chrome.storage.sync.get({clickBehavior: 'search'}, function(items) {
-    let waybackStem = 'https://web.archive.org/web/*/';
-    if (items.clickBehavior == 'direct') {
-      waybackStem = 'https://web.archive.org/web/';
+  chrome.storage.sync.get({urlBehavior: 'recent', tabBehavior: 'new'}, function(items) {
+    let pageNumber = 0;
+    if (items.urlBehavior == 'early') {
+      pageNumber = 9
     }
-    chrome.tabs.update(null, {url: waybackStem + url});
+    const ghostURL = `https://ghostarchive.org/search?term=${encodeURIComponent(url)}&page=${pageNumber}`
+    if (items.tabBehavior == 'redirect') {
+      chrome.tabs.update(null, {url: ghostURL});
+    }
+    else {
+      chrome.tabs.create({
+        url: ghostURL})
+    }
   });
 }
 
@@ -49,7 +61,7 @@ chrome.runtime.onInstalled.addListener(function() {
 
   chrome.contextMenus.create({
     'id': MENU_ITEM_OPEN_LINK,
-    'title': 'Open link in the Wayback Machine',
+    'title': 'Search link on Ghostarchive',
     'contexts': ['link'],
     'targetUrlPatterns': ['ftp://*/*', 'http://*/*', 'https://*/*'],
   });

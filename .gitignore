@@ -1,16 +1,20 @@
-# Editor backup files
-*~
-\#*
-.\#*
-.*.swp
+# IDE files
+.*
 
-# Build system
-.ninja_*
+# Ninja
+build.ninja
+
+# Screenshot (for a later release)
+chrome/screenshot.png
 
 # Generated files
-build
-*.zip
+chrome/*.zip
 
+# Firefox build (for a later release)
+firefox
+
+# Original icons
+third_party
 
 # Local Variables:
 # mode: conf

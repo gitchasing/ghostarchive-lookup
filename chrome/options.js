@@ -1,3 +1,4 @@
+// Copyright 2025 gitchasing
 // Copyright 2019 Google LLC
 //
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not
@@ -12,36 +13,45 @@
 // License for the specific language governing permissions and limitations under
 // the License.
 
+// As required by s4b of the License, all modifications to this file have
+// been specified by the new author (gitchasing).
+// Regard the NOTICE for a list of these changes.
+
 const DEFAULT_OPTIONS = {
-  clickBehavior: 'search',
+  urlBehavior: 'recent',
+  tabBehavior: 'new',
 };
 
 document.addEventListener('DOMContentLoaded', function() {
   chrome.storage.sync.get(DEFAULT_OPTIONS, function(items) {
-    for (let button of document.forms.clickBehavior) {
-      if (button.value == items.clickBehavior) {
-        button.checked = true;
-        break;
+    for (let form of Object.keys(DEFAULT_OPTIONS)) {
+      for (let button of document.forms[form]) {
+        if (button.value == items[form]) {
+          button.checked = true;
+          break;
+        }
       }
     }
   });
 });
 
-function saveOptions() {
-  let clickBehavior = DEFAULT_OPTIONS.clickBehavior;
-  for (let button of document.forms.clickBehavior) {
+function saveOptions(form) {
+  let clickBehavior = DEFAULT_OPTIONS[form];
+  for (let button of document.forms[form]) {
     if (button.checked) {
       clickBehavior = button.value;
       break;
     }
   }
-  chrome.storage.sync.set({
-    clickBehavior: clickBehavior,
-  });
+  let storageObject = {}
+  storageObject[form] = clickBehavior
+  chrome.storage.sync.set(storageObject);
 }
 
-for (let button of document.forms.clickBehavior) {
-  button.addEventListener('change', function(event) {
-    saveOptions();
-  });
+for (let form of Object.keys(DEFAULT_OPTIONS)) {
+  for (let button of document.forms[form]) {
+    button.addEventListener('change', function(event) {
+      saveOptions(form);
+    });
+  }
 }
