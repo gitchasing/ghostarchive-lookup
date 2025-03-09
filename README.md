@@ -1,7 +1,7 @@
 # Ghostarchive Lookup
 
 This Chrome extension adds a "Ghostarchive Lookup" button to your browser toolbar.
-When you click it, it searches for the current tab's URL on Ghost Archive.
+When you click it, it searches for the current tab's URL on Ghostarchive.
 
 ## Credits
 This project is a fork of

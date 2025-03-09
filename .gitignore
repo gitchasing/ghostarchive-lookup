@@ -1,20 +1,8 @@
 # IDE files
 .*
 
-# Ninja
-build.ninja
-
-# Screenshot (for a later release)
-chrome/screenshot.png
-
 # Generated files
 chrome/*.zip
-
-# Firefox build (for a later release)
-firefox
-
-# Original icons
-third_party
 
 # Local Variables:
 # mode: conf

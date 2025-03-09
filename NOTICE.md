@@ -19,8 +19,7 @@ forms would interact with Chrome's storage API.
 This affected all defined functions.
 
 ### chrome/screenshot.png
-This was removed due to irrelevance. A screenshot for the Chrome Web Store will be
-added in a future update.
+This was replaced with a relevant screenshot for the new extension.
 
 ### common/options.html
 A new pair of radio buttons was added in order to give users the choice
