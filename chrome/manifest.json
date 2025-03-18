@@ -1,15 +1,15 @@
 {
   "manifest_version": 3,
   "name": "Ghostarchive Lookup",
-  "version": "1.0.0",
-  "description": "Search current tab for captures from Ghostarchive",
+  "version": "1.1.0",
+  "description": "Search URL for captures from Ghostarchive",
   "icons": {
     "16": "icons/icon16.png",
     "48": "icons/icon48.png",
     "128": "icons/icon128.png"
   },
   "action": {
-    "default_title": "Search current tab for captures from Ghostarchive"
+    "default_title": "Search URL for captures from Ghostarchive"
   },
   "author": "github.com/gitchasing",
   "background": {

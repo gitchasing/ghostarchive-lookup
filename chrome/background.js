@@ -17,33 +17,44 @@
 // been specified by the new author (gitchasing).
 // Regard the NOTICE for a list of these changes.
 
+const MENU_ITEM_ARCHIVE_LINK = 'archiveLink';
+const MENU_ITEM_ARCHIVE_PAGE = 'archivePage';
 const MENU_ITEM_OPEN_LINK = 'openLink';
+const MENU_ITEM_OPEN_PAGE = 'openPage';
 
-function open(url) {
-  chrome.storage.sync.get({urlBehavior: 'recent', tabBehavior: 'new'}, function(items) {
-    let pageNumber = 0;
-    if (items.urlBehavior == 'early') {
-      pageNumber = 9
+function open(tabId, url, archive) {
+  chrome.storage.sync.get({urlBehavior: 'recent', tabBehavior: 'new'}, (items) => {
+    let ghostURL = `https://ghostarchive.org/save/${url}`
+    if (!archive) {
+      let pageNumber = 0;
+      if (items.urlBehavior == 'early') {
+        pageNumber = 9
+      }
+      ghostURL = `https://ghostarchive.org/search?term=${url}&page=${pageNumber}`
     }
-    const ghostURL = `https://ghostarchive.org/search?term=${encodeURIComponent(url)}&page=${pageNumber}`
     if (items.tabBehavior == 'redirect') {
-      chrome.tabs.update(null, {url: ghostURL});
+      chrome.tabs.update(tabId, {url: ghostURL})
     }
     else {
-      chrome.tabs.create({
-        url: ghostURL})
+      chrome.tabs.create({url: ghostURL})
     }
-  });
+  })
 }
 
 chrome.action.onClicked.addListener(function(tab) {
-  open(tab.url);
+  open(tab.id, tab.url, false);
 });
 
 chrome.contextMenus.onClicked.addListener(function(info, tab) {
-  if (info.menuItemId == MENU_ITEM_OPEN_LINK) {
-    open(info.linkUrl);
-  }
+    let archive = false
+    if (info.menuItemId == MENU_ITEM_ARCHIVE_LINK || info.menuItemId == MENU_ITEM_ARCHIVE_PAGE) {
+        archive = true
+    }
+    let url = tab.url
+    if (info.menuItemId == MENU_ITEM_ARCHIVE_LINK || info.menuItemId == MENU_ITEM_OPEN_LINK) {
+        url = info.linkUrl
+    }
+    open(tab.id, url, archive)
 });
 
 chrome.runtime.onInstalled.addListener(function() {
@@ -59,10 +70,25 @@ chrome.runtime.onInstalled.addListener(function() {
     ]);
   });
 
-  chrome.contextMenus.create({
-    'id': MENU_ITEM_OPEN_LINK,
-    'title': 'Search link on Ghostarchive',
-    'contexts': ['link'],
-    'targetUrlPatterns': ['ftp://*/*', 'http://*/*', 'https://*/*'],
-  });
+  function createContextMenu (id, title, contexts, ftp) {
+    let targetUrlPatterns = ['http://*/*', 'https://*/*']
+    if (ftp) {
+      targetUrlPatterns.push('ftp://*/*');
+    }
+    chrome.contextMenus.create({
+      'id': id,
+      'title': title,
+      'contexts': contexts,
+      'targetUrlPatterns': targetUrlPatterns,
+    });
+  }
+
+  createContextMenu(MENU_ITEM_ARCHIVE_LINK, 'Save link on Ghostarchive',
+      ['link'], true);
+  createContextMenu(MENU_ITEM_ARCHIVE_PAGE, 'Save page on Ghostarchive',
+      ['page'], false)
+  createContextMenu(MENU_ITEM_OPEN_LINK, 'Search link on Ghostarchive',
+      ['link'], true)
+  createContextMenu(MENU_ITEM_OPEN_PAGE, 'Search page on Ghostarchive',
+      ['page'], false)
 });

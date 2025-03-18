@@ -9,9 +9,27 @@ Further regard the copyright notices in each program file.
 ## Modifications
 
 ### chrome/background.js
-Two checks were put in place for the `open` function: One for whether the extension
-should search for the most recent or earliest archives, and one for whether
-the archive should be opened in a new tab, or the current tab.
+
+Three context menus were added alongside the existing menu. Together,
+these context menus enable the user to either archive, or search for existing
+archives of, a link or page by right-clicking the respective element.
+
+Two parameters were added to the `open` function:
+```javascript
+function open(tabId, url, archive) {...}
+```
+The `tabId` parameter is to assure that, if the Ghostarchive page is to be
+opened in the current tab, that it opens on the same page that the user action
+was made. The `archive` parameter was added as a check as to whether the
+extension should either archive, or search for existing
+archives of, the specified URL.
+
+Two checks were put in place for the `open` function: One for whether
+the extension should either archive, or search for existing archives of, the URL,
+and one for whether the Ghostarchive URL should be opened in a new tab, or the 
+current tab. A further check, one for whether the extension
+should search for the most recent or earliest archives, is run when searching for
+existing archives.
 
 ### chrome/options.js
 The original author's code was modified so that all radio buttons of different

@@ -1,9 +1,6 @@
 # IDE files
 .*
 
-# Generated files
-chrome/*.zip
-
 # Local Variables:
 # mode: conf
 # End:
