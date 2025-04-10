@@ -1,6 +1,5 @@
 # IDE files
 .*
 
-# Local Variables:
-# mode: conf
-# End:
+# Build files
+build

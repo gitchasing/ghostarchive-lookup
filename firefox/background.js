@@ -1,5 +1,5 @@
-// Copyright 2025 gitchasing
 // Copyright 2017 Google LLC
+// Copyright 2025 gitchasing
 //
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not
 // use this file except in compliance with the License. You may obtain a copy of
@@ -23,7 +23,7 @@ const MENU_ITEM_OPEN_LINK = 'openLink';
 const MENU_ITEM_OPEN_PAGE = 'openPage';
 
 function open(tabId, url, archive) {
-  chrome.storage.sync.get({urlBehavior: 'recent', tabBehavior: 'new'}, (items) => {
+  browser.storage.sync.get({urlBehavior: 'recent', tabBehavior: 'new'}, (items) => {
     let ghostURL = `https://ghostarchive.org/save/${url}`
     if (!archive) {
       let pageNumber = 0;
@@ -33,19 +33,19 @@ function open(tabId, url, archive) {
       ghostURL = `https://ghostarchive.org/search?term=${url}&page=${pageNumber}`
     }
     if (items.tabBehavior == 'redirect') {
-      chrome.tabs.update(tabId, {url: ghostURL})
+      browser.tabs.update(tabId, {url: ghostURL})
     }
     else {
-      chrome.tabs.create({url: ghostURL})
+      browser.tabs.create({url: ghostURL})
     }
   })
 }
 
-chrome.action.onClicked.addListener(function(tab) {
+browser.pageAction.onClicked.addListener(function(tab) {
   open(tab.id, tab.url, false);
 });
 
-chrome.contextMenus.onClicked.addListener(function(info, tab) {
+browser.contextMenus.onClicked.addListener(function(info, tab) {
   let archive = false
   if (info.menuItemId == MENU_ITEM_ARCHIVE_LINK || info.menuItemId == MENU_ITEM_ARCHIVE_PAGE) {
     archive = true
@@ -57,30 +57,24 @@ chrome.contextMenus.onClicked.addListener(function(info, tab) {
   open(tab.id, url, archive)
 });
 
-chrome.runtime.onInstalled.addListener(function() {
-  chrome.declarativeContent.onPageChanged.removeRules(null, function() {
-    chrome.declarativeContent.onPageChanged.addRules([
-      {
-        conditions: [
-          new chrome.declarativeContent.PageStateMatcher(
-              {pageUrl: {schemes: ['ftp', 'http', 'https']}}),
-        ],
-        actions: [new chrome.declarativeContent.ShowPageAction()],
-      },
-    ]);
-  });
-
+browser.runtime.onInstalled.addListener(function() {
   function createContextMenu (id, title, contexts, ftp) {
-    let targetUrlPatterns = ['http://*/*', 'https://*/*']
+    let urlPatterns = ['http://*/*', 'https://*/*']
     if (ftp) {
-      targetUrlPatterns.push('ftp://*/*');
+      urlPatterns.push('ftp://*/*');
     }
-    chrome.contextMenus.create({
+    let createProperties = {
       'id': id,
       'title': title,
       'contexts': contexts,
-      'targetUrlPatterns': targetUrlPatterns,
-    });
+    }
+    if (contexts.includes('link')) {
+      createProperties['targetUrlPatterns'] = urlPatterns
+    }
+    else if (contexts.includes('page')) {
+      createProperties['documentUrlPatterns'] = urlPatterns
+    }
+    browser.contextMenus.create(createProperties);
   }
 
   createContextMenu(MENU_ITEM_ARCHIVE_LINK, 'Save link on Ghostarchive',
