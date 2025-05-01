@@ -17,10 +17,11 @@
 // been specified by the new author (gitchasing).
 // Regard the NOTICE for a list of these changes.
 
-const MENU_ITEM_ARCHIVE_LINK = 'archiveLink';
-const MENU_ITEM_ARCHIVE_PAGE = 'archivePage';
-const MENU_ITEM_OPEN_LINK = 'openLink';
-const MENU_ITEM_OPEN_PAGE = 'openPage';
+import {
+  CONTEXT_MENU_CREATE_PROPERTIES,
+  DEFAULT_OPTIONS,
+  MENU_ITEMS
+} from './constants.js';
 
 function open(tabId, url, archive) {
   browser.storage.sync.get({urlBehavior: 'recent', tabBehavior: 'new'}, (items) => {
@@ -47,42 +48,23 @@ browser.pageAction.onClicked.addListener(function(tab) {
 
 browser.contextMenus.onClicked.addListener(function(info, tab) {
   let archive = false
-  if (info.menuItemId == MENU_ITEM_ARCHIVE_LINK || info.menuItemId == MENU_ITEM_ARCHIVE_PAGE) {
+  if (info.menuItemId == MENU_ITEMS.ARCHIVE_LINK || info.menuItemId == MENU_ITEMS.ARCHIVE_PAGE) {
     archive = true
   }
   let url = tab.url
-  if (info.menuItemId == MENU_ITEM_ARCHIVE_LINK || info.menuItemId == MENU_ITEM_OPEN_LINK) {
+  if (info.menuItemId == MENU_ITEMS.ARCHIVE_LINK || info.menuItemId == MENU_ITEMS.OPEN_LINK) {
     url = info.linkUrl
   }
   open(tab.id, url, archive)
 });
 
 browser.runtime.onInstalled.addListener(function() {
-  function createContextMenu (id, title, contexts, ftp) {
-    let urlPatterns = ['http://*/*', 'https://*/*']
-    if (ftp) {
-      urlPatterns.push('ftp://*/*');
-    }
-    let createProperties = {
-      'id': id,
-      'title': title,
-      'contexts': contexts,
-    }
-    if (contexts.includes('link')) {
-      createProperties['targetUrlPatterns'] = urlPatterns
-    }
-    else if (contexts.includes('page')) {
-      createProperties['documentUrlPatterns'] = urlPatterns
-    }
-    browser.contextMenus.create(createProperties);
+  const STORAGE_OBJECT = {};
+  for (let contextMenuCreateProperty of Object.values(CONTEXT_MENU_CREATE_PROPERTIES)) {
+    contextMenuCreateProperty.createContextMenu();
+    STORAGE_OBJECT[contextMenuCreateProperty.id] = true;
   }
-
-  createContextMenu(MENU_ITEM_ARCHIVE_LINK, 'Save link on Ghostarchive',
-      ['link'], true);
-  createContextMenu(MENU_ITEM_ARCHIVE_PAGE, 'Save page on Ghostarchive',
-      ['page'], false)
-  createContextMenu(MENU_ITEM_OPEN_LINK, 'Search link on Ghostarchive',
-      ['link'], true)
-  createContextMenu(MENU_ITEM_OPEN_PAGE, 'Search page on Ghostarchive',
-      ['page'], false)
+  chrome.storage.sync.set(STORAGE_OBJECT);
 });
+
+export {CONTEXT_MENU_CREATE_PROPERTIES, DEFAULT_OPTIONS, MENU_ITEMS}

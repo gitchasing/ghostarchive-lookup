@@ -1,5 +1,5 @@
-<!-- Copyright 2025 gitchasing
-     Copyright 2019 Google LLC
+<!-- Copyright 2019 Google LLC
+     Copyright 2025 gitchasing
 
 Licensed under the Apache License, Version 2.0 (the "License"); you may not
 use this file except in compliance with the License. You may obtain a copy of
@@ -29,11 +29,18 @@ the License. -->
 <form id="urlBehavior">
   When searching Ghostarchive:<br>
   <label><input type="radio" name="urlBehavior" value="recent"> Show most recent captures.</label><br>
-  <label><input type="radio" name="urlBehavior" value="early"> Show the earliest captures.</label><br>
+  <label><input type="radio" name="urlBehavior" value="early"> Show earliest captures.</label><br>
 </form>
 <form id="tabBehavior">
     <br>When opening Ghostarchive:<br>
     <label><input type="radio" name="tabBehavior" value="new"> Open in new tab.</label><br>
     <label><input type="radio" name="tabBehavior" value="redirect"> Open in current tab.</label><br>
 </form>
-<script src="options.js"></script>
+<form id="contextMenus">
+    <br>Context menus:<br>
+    <label><input type="checkbox" name="contextMenus" value="archiveLink"> Save link on Ghostarchive.</label><br>
+    <label><input type="checkbox" name="contextMenus" value="archivePage"> Save page on Ghostarchive</label><br>
+    <label><input type="checkbox" name="contextMenus" value="openLink"> Search link on Ghostarchive.</label><br>
+    <label><input type="checkbox" name="contextMenus" value="openPage"> Search page on Ghostarchive.</label><br>
+</form>
+<script src="options.js" type="module"></script>

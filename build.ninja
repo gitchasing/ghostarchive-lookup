@@ -1,0 +1,63 @@
+# Copyright 2021 Benjamin Barenblat
+# Copyright 2022 Google LLC
+# Copyright 2025 gitchasing
+#
+# Licensed under the Apache License, Version 2.0 (the "License"); you may not
+# use this file except in compliance with the License. You may obtain a copy of
+# the License at
+#
+#     https://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+# WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+# License for the specific language governing permissions and limitations under
+# the License.
+
+name = ghostarchive-lookup
+
+rule cp
+  command = cp $in $out
+  description = Saving $out
+
+rule generate_png
+  command = inkscape -w $width -h $width -o $out $in && optipng -o7 $out
+  description = Generating $out
+
+rule minify
+  command = minify $in -o $out
+  description = Minifying $in
+
+rule optipng
+  command = cp $in $out &&  optipng -o7 $out
+  description = Optimising $in
+
+rule zip
+  command = zip -jqr $out $in
+  description = Zipping $out
+
+build build/chrome/$name/background.js: minify chrome/background.js
+build build/chrome/$name/constants.js: minify common/constants.js
+build build/chrome/$name/CreateProperties.js: minify chrome/CreateProperties.js
+build build/chrome/$name/manifest.json: minify chrome/manifest.json
+build build/chrome/$name/options.html: minify common/options.html
+build build/chrome/$name/options.js: minify chrome/options.js
+build build/chrome/$name/icon.png: optipng icon.png
+
+build build/chrome/$name.zip: zip build/chrome/$name/background.js $
+    build/chrome/$name/constants.js build/chrome/$name/CreateProperties.js $
+    build/chrome/$name/manifest.json build/chrome/$name/options.html $
+    build/chrome/$name/options.js build/chrome/$name/icon.png
+
+build build/firefox/$name/background.js: cp firefox/background.js
+build build/firefox/$name/constants.js: cp common/constants.js
+build build/firefox/$name/CreateProperties.js: cp firefox/CreateProperties.js
+build build/firefox/$name/manifest.json: cp firefox/manifest.json
+build build/firefox/$name/options.html: cp common/options.html
+build build/firefox/$name/options.js: cp firefox/options.js
+build build/firefox/$name/icon.png: cp icon.png
+
+build build/firefox/$name.zip: zip build/firefox/$name/background.js $
+    build/firefox/$name/constants.js build/firefox/$name/CreateProperties.js $
+    build/firefox/$name/manifest.json build/firefox/$name/options.html $
+    build/firefox/$name/options.js build/firefox/$name/icon.png

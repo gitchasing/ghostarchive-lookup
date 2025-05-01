@@ -1,5 +1,5 @@
-// Copyright 2025 gitchasing
 // Copyright 2019 Google LLC
+// Copyright 2025 gitchasing
 //
 // Licensed under the Apache License, Version 2.0 (the "License"); you may not
 // use this file except in compliance with the License. You may obtain a copy of
@@ -17,13 +17,19 @@
 // been specified by the new author (gitchasing).
 // Regard the NOTICE for a list of these changes.
 
-const DEFAULT_OPTIONS = {
-  urlBehavior: 'recent',
-  tabBehavior: 'new',
-};
+import {
+  CONTEXT_MENU_CREATE_PROPERTIES,
+  DEFAULT_OPTIONS,
+  MENU_ITEMS
+} from './constants.js'
+
+const CONTEXT_MENUS = {}
+for (const MENU_ITEM of Object.values(MENU_ITEMS)) {
+  CONTEXT_MENUS[MENU_ITEM] = true;
+}
 
 document.addEventListener('DOMContentLoaded', function() {
-  chrome.storage.sync.get(DEFAULT_OPTIONS, function(items) {
+  chrome.storage.sync.get(Object.assign({}, DEFAULT_OPTIONS, CONTEXT_MENUS), function(items) {
     for (let form of Object.keys(DEFAULT_OPTIONS)) {
       for (let button of document.forms[form]) {
         if (button.value == items[form]) {
@@ -32,20 +38,23 @@ document.addEventListener('DOMContentLoaded', function() {
         }
       }
     }
+    for (let checkbox of document.forms['contextMenus']) {
+      checkbox.checked = items[checkbox.value]
+    }
   });
 });
 
 function saveOptions(form) {
-  let clickBehavior = DEFAULT_OPTIONS[form];
+  let behavior = DEFAULT_OPTIONS[form];
   for (let button of document.forms[form]) {
     if (button.checked) {
-      clickBehavior = button.value;
+      behavior = button.value;
       break;
     }
   }
-  let storageObject = {}
-  storageObject[form] = clickBehavior
-  chrome.storage.sync.set(storageObject);
+  chrome.storage.sync.set({
+    [form]: behavior,
+  });
 }
 
 for (let form of Object.keys(DEFAULT_OPTIONS)) {
@@ -54,4 +63,20 @@ for (let form of Object.keys(DEFAULT_OPTIONS)) {
       saveOptions(form);
     });
   }
+}
+
+for (let checkbox of document.forms['contextMenus']) {
+  checkbox.addEventListener('change', function(event) {
+    const CHECKBOX_CHECKED = event.target.checked;
+    const CHECKBOX_VALUE = event.target.value;
+    if (CHECKBOX_CHECKED) {
+      CONTEXT_MENU_CREATE_PROPERTIES[CHECKBOX_VALUE].createContextMenu();
+    }
+    else {
+      CONTEXT_MENU_CREATE_PROPERTIES[CHECKBOX_VALUE].removeContextMenu();
+    }
+    chrome.storage.sync.set({
+      [CHECKBOX_VALUE]: CHECKBOX_CHECKED
+    });
+  });
 }
